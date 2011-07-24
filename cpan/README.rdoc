@@ -1,0 +1,36 @@
+= DESCRIPTION:
+
+  - cpan modules package provider
+  - features:
+    - install / update 
+    - dry-run
+    
+= REQUIREMENTS:
+
+  perl
+  CPAN
+
+= ATTRIBUTES:
+
+= USAGE:
+
+ cpan_module "CGI" do
+   action :install
+ end
+
+ cpan_module "CGI" do
+   action :install
+   version '3.52' 
+ end
+ 
+ cpan_module "CGI" do
+   action :update
+ end
+ 
+ cpan_module "Moose" do
+   action :install
+   pretend true
+   dry_run_verbose true
+   dry_run_skip_test false
+ end
+
