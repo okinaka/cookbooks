@@ -2,7 +2,7 @@
 # Cookbook Name:: bouncehammer
 # Recipe:: default
 #
-# Copyright 2011, Example Com
+# Copyright 2011, Okinaka
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package "libpath-class-perl" do
   action :install
 end
 
-mods = [
+cpan_mods = [
   "Class::Accessor::Fast::XS",
   "Crypt:CBC",
   "Crypt::DES",
@@ -34,7 +34,7 @@ mods = [
   "Perl6::Slurp",
   "Term::ProgressBar",
   "Text::ASCIITable"]
-mods.each do |module_name|
+cpan_mods.each do |module_name|
   cpan_module module_name 
 end
 
@@ -46,7 +46,8 @@ remote_file "#{Chef::Config[:file_cache_path]}/bouncehammer-#{version}.tar.gz" d
 end
 
 configure_options = "--disable-webui --prefix=/usr/local/bouncehammer"
-bash "build bh" do
+script "build_bouncehammer" do
+  interpreter "bash"
   cwd Chef::Config[:file_cache_path]
   code <<-EOF
   tar -xzvf bouncehammer-#{version}.tar.gz
@@ -55,3 +56,23 @@ bash "build bh" do
   EOF
 end
 
+# For sqlite.
+sqlite_pkgs = ["sqlite3", "libdbd-sqlite3-perl"]
+sqlite_pkgs.each do |pkg|
+  package pkg do
+    action :install
+  end
+end
+script "setup_sqlite" do
+  interpreter "bash"
+  cwd "/usr/local/bouncehammer"
+  code <<-EOF
+  touch var/db/bouncehammer.db
+  cat share/script/SQLite*.sql | sqlite3 var/db/bouncehammer.db
+  cat share/script/mastertable-* | sqlite3 var/db/bouncehammer.db
+  EOF
+end
+
+cookbook_file "/usr/local/bouncehammer/etc/bouncehammer.cf" do
+  source "bouncehammer.cf"
+end

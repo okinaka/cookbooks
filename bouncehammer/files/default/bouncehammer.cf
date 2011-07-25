@@ -1,0 +1,145 @@
+# bouncehammer.cf
+# $Id: bouncehammer.cf-example,v 1.13.2.4 2011/03/19 09:41:17 ak Exp $
+# This configuration file is YAML format. bin/* scripts read this file
+# by using (YAML|JSON)::Syck/ Perl module.
+#  ______   ______ _____ _____ __  __ 
+# / ___\ \ / / ___|_   _| ____|  \/  |
+# \___ \\ V /\___ \ | | |  _| | |\/| |
+#  ___) || |  ___) || | | |___| |  | |
+# |____/ |_| |____/ |_| |_____|_|  |_|
+# 
+# System name and configuration file version, 
+# *** Do not change the system: and the version: ***
+system: 'bounceHammer'
+version: '2.7.0'
+
+# Setting name
+name: 'Default'
+
+#  _____ ___ _     _____ 
+# |  ___|_ _| |   | ____|
+# | |_   | || |   |  _|  
+# |  _|  | || |___| |___ 
+# |_|   |___|_____|_____|
+# 
+file:
+  # MaxSize: <n> Bytes, 0 is unlimit.(bin/mailboxparser)
+  maxsize: 134217728
+
+  # Temporary log file.(bin/mailboxparser)
+  templog:
+    prefix: 'hammer'
+    suffix: 'tmp'
+
+  # Stored log file.(bin/logger)
+  storage:
+    prefix: 'hammer'
+    suffix: 'log'
+
+#  ____ ___ ____  _____ ____ _____ ___  ______   __
+# |  _ \_ _|  _ \| ____/ ___|_   _/ _ \|  _ \ \ / /
+# | | | | || |_) |  _|| |     | || | | | |_) \ V / 
+# | |_| | ||  _ <| |__| |___  | || |_| |  _ < | |  
+# |____/___|_| \_\_____\____| |_| \___/|_| \_\|_|  
+#
+directory:
+  conf: '/usr/local/bouncehammer/etc'
+  pid: '/usr/local/bouncehammer/var/pid'
+
+  # Log storage, bin/logger command uses the following directory.
+  log: '/usr/local/bouncehammer/var/log'
+
+  # Working directory of commandline tools in bin/ directory.
+  tmp: '/tmp'
+
+  # Cache directory for WebUI/Download
+  cache: '/usr/local/bouncehammer/var/cache'
+
+  # Log storage, -o(--output) option of bin/mailboxparser command
+  # overrides this value.
+  spool: '/usr/local/bouncehammer/var/spool'
+
+  # Upload directory(NOT IMPLEMENTED)
+  incoming: '/usr/local/bouncehammer/var/incoming'
+
+#  _   _ _____ _______        _____  ____  _  __
+# | \ | | ____|_   _\ \      / / _ \|  _ \| |/ /
+# |  \| |  _|   | |  \ \ /\ / / | | | |_) | ' / 
+# | |\  | |___  | |   \ V  V /| |_| |  _ <| . \ 
+# |_| \_|_____| |_|    \_/\_/  \___/|_| \_\_|\_\
+# 
+# For Future Release
+smtp:
+  relayhost: '127.0.0.1'
+  port: 25
+  authentication:
+    smtpauth: 0
+    mechanism: 'MD5'
+    username: ''
+    password: ''
+  from: 'postmaster@'
+
+#  ____    _  _____  _    ____    _    ____  _____ 
+# |  _ \  / \|_   _|/ \  | __ )  / \  / ___|| ____|
+# | | | |/ _ \ | | / _ \ |  _ \ / _ \ \___ \|  _|  
+# | |_| / ___ \| |/ ___ \| |_) / ___ \ ___) | |___ 
+# |____/_/   \_\_/_/   \_\____/_/   \_\____/|_____|
+# 
+database:
+  # Database type(Available values are PostgreSQL, MySQL or SQLite)
+  # If you use SQLite database, please specify a path into the dbname value.
+  dbtype: 'SQLite'
+  dbname: '/usr/local/bouncehammer/var/db/bouncehammer.db'
+  #dbtype: 'PostgreSQL'
+  #dbname: 'bouncehammer'
+
+  # Database name, username and password of the db-user
+  username: 'bouncehammer'
+  password: ''
+
+  # Database host or IP address, and port number
+  #  Postgresql = 5432, MySQL = 3306 by default. If the dbtype value is
+  #  'SQLite', the system ignore 'hostname' and 'port'.
+  #  Connect to the database via UNIX domain socket, set empty value into
+  #  'hostname' and 'port', or set the path to the socket into 'port'.
+  #   * Socket
+  #      hostname: 'localhost' or Empty
+  #      port: '/path/to/socket' or '/path/to/socket/dir' or Empty
+  #   * TCP/IP
+  #      hostname: IP address or Hostname
+  #      port: Port number the db is listening
+  hostname: '127.0.0.1'
+  port: 5432
+
+#  _____ _   ___     _____ ____   ___  _   _ __  __ _____ _   _ _____ 
+# | ____| \ | \ \   / /_ _|  _ \ / _ \| \ | |  \/  | ____| \ | |_   _|
+# |  _| |  \| |\ \ / / | || |_) | | | |  \| | |\/| |  _| |  \| | | |  
+# | |___| |\  | \ V /  | ||  _ <| |_| | |\  | |  | | |___| |\  | | |  
+# |_____|_| \_|  \_/  |___|_| \_\\___/|_| \_|_|  |_|_____|_| \_| |_|  
+#
+# Environment configurations
+environment:
+  # Timeout while read from STDIN(second)
+  timeout: 180 
+
+  # Run As ...(Not implemented)
+  runas:
+    user: ''
+    group: 'bouncehammer'
+
+#  ______   ______  _     ___   ____ 
+# / ___\ \ / / ___|| |   / _ \ / ___|
+# \___ \\ V /\___ \| |  | | | | |  _ 
+#  ___) || |  ___) | |__| |_| | |_| |
+# |____/ |_| |____/|_____\___/ \____|
+#                                    
+# UNIX syslog(3) configuration, Beginning with bounceHammer 2.7.0
+# mailboxparser, logger, databasectl, and tablectl use this configuration
+syslog:
+  # By default, messages will not be sent syslog(3). If you want to
+  # use syslog(3), set 1 to the value of enabled:.
+  enabled: 0
+  facility: 'local6'
+
+
+...
