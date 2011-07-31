@@ -18,26 +18,30 @@
 #
 include_recipe "perl"
 
-base_pkgs = ["build-essential", "perl-doc"]
+ws = node[:bouncehammer][:webui] || node[:bouncehammer][:api]
+
+
+base_pkgs = %w{build-essential perl-doc}
+base_pkgs += ["apache2"] if ws
 base_pkgs.each do |pkg|
   package pkg do
     action :install
   end
 end
 
-perl_pkgs = [
-    "libcompress-zlib-perl",
-    "libcrypt-cbc-perl", 
-    "libcrypt-des-perl",
-    "liberror-perl",
-    "libpath-class-perl",
-    "libperl6-slurp-perl",
-    "libterm-progressbar-perl",
-    "libtext-asciitable-perl",
-    "libdbd-sqlite3-perl",
-    "libtime-piece-perl",
-    "libyaml-syck-perl"
-  ]
+perl_pkgs = %w{
+    libcompress-zlib-perl
+    libcrypt-cbc-perl 
+    libcrypt-des-perl
+    liberror-perl
+    libpath-class-perl
+    libperl6-slurp-perl
+    libterm-progressbar-perl
+    libtext-asciitable-perl
+    libdbd-sqlite3-perl
+    libtime-piece-perl
+    libyaml-syck-perl
+  }
 perl_pkgs.each do |pkg|
   package pkg do
     action :install
@@ -50,6 +54,15 @@ cpan_mods = [
   "Email::AddressParser",
   "Path::Class::File::Lockable",
   ]
+
+cpan_mods += [
+  "CGI::Application",
+  "CGI::Application::Dispatch",
+  "CGI::Application::Plugin::HTMLPrototype",
+  "CGI::Application::Plugin::Session",
+  "CGI::Application::Plugin::TT",
+  ] if node[:bouncehammer][:webui]
+
 cpan_mods.each do |module_name|
   cpan_module module_name 
 end
@@ -62,7 +75,9 @@ remote_file "#{Chef::Config[:file_cache_path]}/bouncehammer-#{version}.tar.gz" d
   mode "0644"
 end
 
-configure_options = "--disable-webui --prefix=#{dist_dir}"
+configure_options = " --prefix=#{dist_dir}"
+configure_options += " --disable-webui" unless ws
+
 script "build_bouncehammer" do
   interpreter "bash"
   cwd Chef::Config[:file_cache_path]
@@ -85,6 +100,7 @@ script "setup_sqlite" do
   cwd dist_dir
   code <<-EOF
   touch var/db/bouncehammer.db
+  chmod 666 var/db/bouncehammer.db
   cat share/script/SQLite*.sql | sqlite3 var/db/bouncehammer.db
   cat share/script/mastertable-* | sqlite3 var/db/bouncehammer.db
   EOF
@@ -92,4 +108,58 @@ end
 
 cookbook_file "#{dist_dir}/etc/bouncehammer.cf" do
   source "bouncehammer.cf"
+  mode "0644"
+end
+
+
+# For webui.
+if ws then
+
+  cookbook_file "#{dist_dir}/etc/webui.cf" do
+    source "webui.cf"
+    mode "0644"
+  end
+
+  %w{mods-available/mime.conf sites-available/default}.each do |conf|
+    cookbook_file "/etc/apache2/#{conf}" do
+      source "apache2/#{conf}"
+      mode "0644"
+    end
+  end
+
+  cookbook_file "/etc/apache2/sites-available/default" do
+    source "apache2/sites-available/default"
+    mode "0644"
+  end
+
+  directory "/var/www/bouncehammer" do
+    action :create
+    mode "0755"
+  end
+
+  if node[:bouncehammer][:api] then
+    script "setup_api" do
+      interpreter "bash"
+      cwd dist_dir
+      code <<-EOF
+      cp share/script/api.cgi /var/www/bouncehammer/api.cgi
+      chmod 755 /var/www/bouncehammer/api.cgi
+      EOF
+     end
+  end
+
+  if node[:bouncehammer][:webui] then
+    script "setup_webui" do
+      interpreter "bash"
+      cwd dist_dir
+      code <<-EOF
+      cp share/script/bouncehammer.cgi /var/www/bouncehammer/index.cgi
+      chmod 755 /var/www/bouncehammer/index.cgi
+      EOF
+    end
+  end
+
+  service "apache2" do
+    action :restart
+  end
 end

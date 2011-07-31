@@ -1,0 +1,80 @@
+# webui.cf
+# $Id: webui.cf-example,v 1.3.2.2 2011/03/19 09:41:17 ak Exp $
+# This configuration file is YAML/JSON format. cgi/* scripts read this
+# file by using (YAML|JSON)::Syck/ Perl module.
+# __        _______ ____  _   _ ___ 
+# \ \      / / ____| __ )| | | |_ _|
+#  \ \ /\ / /|  _| |  _ \| | | || | 
+#   \ V  V / | |___| |_) | |_| || | 
+#    \_/\_/  |_____|____/ \___/|___|
+# 
+# Setting name
+name: 'Default'
+
+# Default language,
+#  en: English
+#  ja: Japanese
+language: 'ja'
+upload:
+  maxsize: 524288
+session:
+  expires: '+9h'
+
+#  ____    _  _____  _    ____    _    ____  _____ 
+# |  _ \  / \|_   _|/ \  | __ )  / \  / ___|| ____|
+# | | | |/ _ \ | | / _ \ |  _ \ / _ \ \___ \|  _|  
+# | |_| / ___ \| |/ ___ \| |_) / ___ \ ___) | |___ 
+# |____/_/   \_\_/_/   \_\____/_/   \_\____/|_____|
+# 
+database:
+  # Table configurations
+  #  readonlhy: It's read-only table on the WebUI.
+  #  maxrecords: The number of maximum records, 0 is unlimited
+  table:
+    bouncelogs:
+      readonly: 0
+      maxrecords: 0
+
+    senderdomains:
+      readonly: 0
+      maxrecords: 0
+
+    destinations:
+      readonly: 0
+      maxrecords: 0
+
+#     _    ____   ____ _   _ _____     _______ 
+#    / \  |  _ \ / ___| | | |_ _\ \   / / ____|
+#   / _ \ | |_) | |   | |_| || | \ \ / /|  _|  
+#  / ___ \|  _ <| |___|  _  || |  \ V / | |___ 
+# /_/   \_\_| \_\\____|_| |_|___|  \_/  |_____|
+#                                              
+# Archive configurations
+archive:
+  expires: '1h'
+  compress:
+    # Compress: require the following modules
+    #  bzip2 = IO::Compress::Bzip2
+    #  gzip = IO::Compress::Gzip(default)
+    #  zip = IO::Compress::Zip
+    type: 'gzip'
+
+
+#  ____  _____ ____ _   _ ____  ___ _______   __
+# / ___|| ____/ ___| | | |  _ \|_ _|_   _\ \ / /
+# \___ \|  _|| |   | | | | |_) || |  | |  \ V / 
+#  ___) | |__| |___| |_| |  _ < | |  | |   | |  
+# |____/|_____\____|\___/|_| \_\___| |_|   |_|  
+#
+security:
+  # Crypt configurations are used by WebUI(Encrypt URL)
+  # The following values are argument of Crypt::CBC->new() .
+  crypt:
+    salt: 'kanadzuchi'
+    key: 'MySecretKey'
+
+    # Requires Crypt::* perl module,
+    #  Blowfish, Rijndael, IDEA, DES
+    cipher: 'DES'
+
+...
