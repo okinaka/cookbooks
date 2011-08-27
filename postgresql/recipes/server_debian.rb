@@ -29,7 +29,6 @@ end
 package "postgresql"
 
 service "postgresql" do
-  service_name "postgresql-#{node.postgresql.version}"
   supports :restart => true, :status => true, :reload => true
   action :nothing
 end
