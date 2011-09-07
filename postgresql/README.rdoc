@@ -6,7 +6,7 @@ Installs and configures postgresql client or server.
 
 == Platform:
 
-Tested on CentOS 5.5, Ubuntu 10.04 but should support centos, redhat, fedora, suse, ubuntu and debian.
+Tested on Scientific 6.1, Debian 6.0 but should support centos, redhat, fedora, scientific, suse, ubuntu and debian.
 
 == Cookbooks:
 
@@ -32,9 +32,7 @@ The templates provided by this cookbook will probably need to be tweaked for the
 
 = LICENSE and AUTHOR:
       
-Author:: Joshua Timberman (<joshua@opscode.com>)
-
-Copyright:: 2009-2010, Opscode, Inc
+Author:: OKINAKA Kenshin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
