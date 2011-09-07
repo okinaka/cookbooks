@@ -47,7 +47,7 @@ when "fedora"
 
   set[:postgresql][:dir] = "/var/lib/pgsql/data"
 
-when "redhat","centos"
+when "redhat","centos","scientific"
 
   default[:postgresql][:version] = "8.4"
   set[:postgresql][:dir] = "/var/lib/pgsql/data"
@@ -64,5 +64,5 @@ when "suse"
 
 else
   default[:postgresql][:version] = "8.4"
-  set[:postgresql][:dir]            = "/etc/postgresql/#{node[:postgresql][:version]}/main"
+  set[:postgresql][:dir] = "/etc/postgresql/#{node[:postgresql][:version]}/main"
 end

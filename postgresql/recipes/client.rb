@@ -18,10 +18,8 @@
 #
 
 case node.platform
+when "fedora","scientific","suse","redhat","centos"
+  package "postgresql"
 when "ubuntu","debian"
   package "postgresql-client"
-when "fedora","suse"
-  package "postgresql-devel"
-when "redhat","centos"
-  package "postgresql#{node.postgresql.version.split('.').join}-devel"
 end

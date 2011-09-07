@@ -25,14 +25,14 @@ include_recipe "postgresql::client"
 group "postgres" do
   # Workaround lack of option for -r and -o...
   group_name "-r -o postgres"
-  not_if { Etc.getgrnam("postgres") }
+  not_if { Etc.getgrnam("postgres") rescue false }
   gid 26
 end
 
 user "postgres" do
   # Workaround lack of option for -M and -n...
   username "-M -n postgres"
-  not_if { Etc.getpwnam("postgres") }
+  not_if { Etc.getpwnam("postgres") rescue false }
   shell "/bin/bash"
   comment "PostgreSQL Server"
   home "/var/lib/pgsql"
@@ -42,21 +42,7 @@ user "postgres" do
   supports :non_unique => true
 end
 
-package "postgresql" do
-  case node.platform
-  when "redhat","centos"
-    package_name "postgresql#{node.postgresql.version.split('.').join}"
-  else
-    package_name "postgresql"
-  end
-end
-
-case node.platform
-when "redhat","centos"
-  package "postgresql#{node.postgresql.version.split('.').join}-server"
-when "fedora","suse"
-  package "postgresql-server"
-end
+package "postgresql-server"
 
 execute "/sbin/service postgresql initdb" do
   not_if { ::FileTest.exist?(File.join(node.postgresql.dir, "PG_VERSION")) }
