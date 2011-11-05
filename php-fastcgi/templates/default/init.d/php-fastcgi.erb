@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PHP_SCRIPT=/usr/bin/php-fastcgi
-FASTCGI_USER=www-data
-FASTCGI_GROUP=www-data
+FASTCGI_USER=<%= node['php-fastcgi'][:user] %>
+FASTCGI_GROUP=<%= node['php-fastcgi'][:group] %>
 PID_DIR=/var/run/php-fastcgi
 PID_FILE=/var/run/php-fastcgi/php-fastcgi.pid
 RET_VAL=0

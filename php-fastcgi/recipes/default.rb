@@ -1,4 +1,4 @@
-%w{psmisc php5-cgi spawn-fcgi}.each do |pkg|
+%w{php5-cgi spawn-fcgi}.each do |pkg|
   package pkg
 end
 
