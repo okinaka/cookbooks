@@ -1,11 +1,21 @@
 #!/bin/bash
 
-PHP_SCRIPT=/usr/bin/php-fastcgi
 FASTCGI_USER=<%= node['php-fastcgi'][:user] %>
 FASTCGI_GROUP=<%= node['php-fastcgi'][:group] %>
 PID_DIR=/var/run/php-fastcgi
 PID_FILE=/var/run/php-fastcgi/php-fastcgi.pid
 RET_VAL=0
+
+PHP_SCRIPT() {
+  ADDRESS=<%= node['php-fastcgi'][:address] %>
+  PORT=<%= node['php-fastcgi'][:port] %>
+  CHILDREN=<%= node['php-fastcgi'][:children] %>
+  PHP5=/usr/bin/php5-cgi
+  SPAWN=/usr/bin/spawn-fcgi
+
+  $SPAWN -a $ADDRESS -p $PORT -P $PID_FILE -C $CHILDREN \
+         -u $FASTCGI_USER -g $FASTCGI_GROUP -f $PHP5
+}
 
 case "$1" in
     start)
@@ -20,7 +30,7 @@ case "$1" in
         echo "php-fastcgi already running with PID `cat $PID_FILE`"
         RET_VAL=1
       else
-        $PHP_SCRIPT
+        PHP_SCRIPT
         RET_VAL=$?
       fi
   ;;
@@ -44,7 +54,7 @@ case "$1" in
       else
         echo "Could not find PID file $PID_FILE"
       fi
-      $PHP_SCRIPT
+      PHP_SCRIPT
       RET_VAL=$?
   ;;
     status)
